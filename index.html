@@ -11,161 +11,176 @@
  
  <image src="2.gif.pagespeed.ce.K68b7JMxT3.gif"/>
  
- <!DOCTYPE html>
-<html>
+ <html>
 <head>
-  <title></title>
-  <style>
-  html, body {
-    height: 100%;
-    margin: 0;
-  }
-  body {
-    background: black;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  canvas {
-    border: 1px solid white;
-  }
-  </style>
+	<style>
+	html,body {
+		padding: 0;
+		margin: 0;
+	}
+	#left-paddle {
+		background-color: green;
+		left: 10px;
+	}
+	#right-paddle {
+		background-color: blue;
+		right: 10px;
+	}
+	.paddle {
+		top: 0;
+		height: 200px;
+		width: 10px;
+		position: absolute;
+	}
+	.ball {
+		width: 20px;
+		height: 20px;
+		background-color: red;
+		border-radius: 10px;
+		position: absolute;
+		left: 50px;
+		top: 50px;
+	}
+	.score {
+		position: absolute;
+		top: 0;
+	}
+	#left-score {
+		left: 10%;
+	}
+	#right-score {
+		right: 10%;
+	}
+	</style>
 </head>
 <body>
-<canvas width="400" height="400" id="game"></canvas>
-<script>
-var canvas = document.getElementById('game');
-var context = canvas.getContext('2d');
-var grid = 16;
-var count = 0;
-  
-var snake = {
-  x: 160,
-  y: 160,
-  
-  // snake velocity. moves one grid length every frame in either the x or y direction
-  dx: grid,
-  dy: 0,
-  
-  // keep track of all grids the snake body occupies
-  cells: [],
-  
-  // length of the snake. grows when eating an apple
-  maxCells: 4
-};
-var apple = {
-  x: 320,
-  y: 320
-};
-// get random whole numbers in a specific range
-// @see https://stackoverflow.com/a/1527820/2124254
-function getRandomInt(min, max) {
-  return Math.floor(Math.random() * (max - min)) + min;
-}
-// game loop
-function loop() {
-  requestAnimationFrame(loop);
-  // slow game loop to 15 fps instead of 60 (60/15 = 4)
-  if (++count < 4) {
-    return;
-  }
-  count = 0;
-  context.clearRect(0,0,canvas.width,canvas.height);
-  // move snake by it's velocity
-  snake.x += snake.dx;
-  snake.y += snake.dy;
-  // wrap snake position horizontally on edge of screen
-  if (snake.x < 0) {
-    snake.x = canvas.width - grid;
-  }
-  else if (snake.x >= canvas.width) {
-    snake.x = 0;
-  }
-  
-  // wrap snake position vertically on edge of screen
-  if (snake.y < 0) {
-    snake.y = canvas.height - grid;
-  }
-  else if (snake.y >= canvas.height) {
-    snake.y = 0;
-  }
-  // keep track of where snake has been. front of the array is always the head
-  snake.cells.unshift({x: snake.x, y: snake.y});
-  // remove cells as we move away from them
-  if (snake.cells.length > snake.maxCells) {
-    snake.cells.pop();
-  }
-  // draw apple
-  context.fillStyle = 'red';
-  context.fillRect(apple.x, apple.y, grid-1, grid-1);
-  // draw snake one cell at a time
-  context.fillStyle = 'green';
-  snake.cells.forEach(function(cell, index) {
-    
-    // drawing 1 px smaller than the grid creates a grid effect in the snake body so you can see how long it is
-    context.fillRect(cell.x, cell.y, grid-1, grid-1);  
-    // snake ate apple
-    if (cell.x === apple.x && cell.y === apple.y) {
-      snake.maxCells++;
-      // canvas is 400x400 which is 25x25 grids 
-      apple.x = getRandomInt(0, 25) * grid;
-      apple.y = getRandomInt(0, 25) * grid;
-    }
-    // check collision with all cells after this one (modified bubble sort)
-    for (var i = index + 1; i < snake.cells.length; i++) {
-      
-      // snake occupies same space as a body part. reset game
-      if (cell.x === snake.cells[i].x && cell.y === snake.cells[i].y) {
-        snake.x = 160;
-        snake.y = 160;
-        snake.cells = [];
-        snake.maxCells = 4;
-        snake.dx = grid;
-        snake.dy = 0;
-        apple.x = getRandomInt(0, 25) * grid;
-        apple.y = getRandomInt(0, 25) * grid;
-      }
-    }
-  });
-}
-// listen to keyboard events to move the snake
-document.addEventListener('keydown', function(e) {
-  // prevent snake from backtracking on itself by checking that it's 
-  // not already moving on the same axis (pressing left while moving
-  // left won't do anything, and pressing right while moving left
-  // shouldn't let you collide with your own body)
-  
-  // left arrow key
-  if (e.which === 37 && snake.dx === 0) {
-    snake.dx = -grid;
-    snake.dy = 0;
-  }
-  // up arrow key
-  else if (e.which === 38 && snake.dy === 0) {
-    snake.dy = -grid;
-    snake.dx = 0;
-  }
-  // right arrow key
-  else if (e.which === 39 && snake.dx === 0) {
-    snake.dx = grid;
-    snake.dy = 0;
-  }
-  // down arrow key
-  else if (e.which === 40 && snake.dy === 0) {
-    snake.dy = grid;
-    snake.dx = 0;
-  }
-});
-// start the game
-requestAnimationFrame(loop);
-</script>
+	ezpzxd
+
+	<div class="paddle" id="left-paddle"></div>
+	<div class="paddle" id="right-paddle"></div>
+	<div class="ball" id="ball"></div>
+
+	<h1 class="score" id="left-score">0</h1>
+	<h1 class="score" id="right-score">0</h1>
+
+	<script>
+	'use strict';
+	var paddleLeft = document.getElementById('left-paddle');
+	var paddleRight = document.getElementById('right-paddle');
+	var ball = document.getElementById('ball');
+	var paddleLeftTop = 0;
+	var paddleRightTop = 0;
+	var paddleLeftHeight = 200;
+	var paddleRightHeight = 200;
+	var paddleRightDirection = 0;
+	var paddleRightTimer;
+	var paddleLeftDirection = 0;
+	var paddleLeftTimer;
+	paddleLeft.style.top = 0;
+	paddleRight.style.top = 0;
+	var ballXPos = 50;
+	var ballYPos = 50;
+	var ballXDir = 5;
+	var ballYDir = 5;
+	var ballWidth = 20;
+	var ballHeight = 20;
+	var leftScoreDisplay = document.getElementById('left-score');
+	var rightScoreDisplay = document.getElementById('right-score');
+	var leftScore = 0;
+	var rightScore = 0;
+	function updateScoreDisplay() {
+		leftScoreDisplay.innerHTML = leftScore;
+		rightScoreDisplay.innerHTML = rightScore;
+	}
+	function moveBall() {
+		var newBallXPos = ballXPos + ballXDir;
+		var newBallYPos = ballYPos + ballYDir;
+		if (newBallXPos + ballWidth > window.innerWidth) {
+			ballXDir = -Math.abs(ballXDir);
+		}
+		if (newBallYPos + ballHeight > window.innerHeight) {
+			ballYDir = -Math.abs(ballYDir);
+		}
+		if (newBallXPos < 0) {
+			ballXDir = Math.abs(ballXDir);
+		}
+		if (newBallYPos < 0) {
+			ballYDir = Math.abs(ballYDir);
+		}
+		ballXPos += ballXDir;
+		ballYPos += ballYDir;
+		if (ballXPos < 20 && 
+			(ballYPos + 20 < paddleLeftTop || 
+			 ballYPos > paddleLeftTop + paddleLeftHeight)) {
+			rightScore += 1;
+			updateScoreDisplay();
+		}
+		if (ballXPos + 20 > window.innerWidth - 20 && 
+			(ballYPos + 20 < paddleRightTop || 
+			 ballYPos > paddleRightTop + paddleRightHeight)) {
+			leftScore += 1;
+			updateScoreDisplay();
+		}
+		ball.style.top = ballYPos + 'px';
+		ball.style.left = ballXPos + 'px';
+	}
+	function moveRightPaddle() {
+		paddleRightTop += paddleRightDirection;
+		paddleRight.style.top = paddleRightTop + 'px';
+	}
+	function moveLeftPaddle() {
+		paddleLeftTop += paddleLeftDirection;
+		paddleLeft.style.top = paddleLeftTop + 'px';
+	}
+	setInterval(moveBall, 25);
+	setInterval(function() {
+		if (ballXDir < 50) ballXDir *= 1.1;
+		if (ballYDir < 50) ballYDir *= 1.1;
+	}, 10000)
+	document.addEventListener('keydown', function(evt) {
+		switch (evt.code) {
+			case 'ArrowDown':
+				if (!paddleRightTimer) {
+					paddleRightDirection = 10;
+					paddleRightTimer = setInterval(moveRightPaddle, 100);
+				}
+				break;
+			case 'ArrowUp':
+				if (!paddleRightTimer) {
+					paddleRightDirection = -10;
+					paddleRightTimer = setInterval(moveRightPaddle, 100);
+				}
+				break;
+			case 'KeyS':
+				if (!paddleLeftTimer) {
+					paddleLeftDirection = 10;
+					paddleLeftTimer = setInterval(moveLeftPaddle, 100);
+				}
+				break;
+			case 'KeyW':
+				if (!paddleLeftTimer) {
+					paddleLeftDirection = -10;
+					paddleLeftTimer = setInterval(moveLeftPaddle, 100);
+				}
+				break;
+		}
+		console.log(evt);
+	})
+	document.addEventListener('keyup', function(evt) {
+		switch (evt.code) {
+			case 'ArrowDown':
+			case 'ArrowUp':
+				clearInterval(paddleRightTimer);
+				paddleRightTimer = null;
+				break;
+			case 'KeyS':
+			case 'KeyW':
+				clearInterval(paddleLeftTimer);
+				paddleLeftTimer = null;
+				break;
+		}
+		console.log(evt);
+	})
+	</script>
 </body>
 </html>
-
- 
- 
-
-</body>
-</html>
-
-
